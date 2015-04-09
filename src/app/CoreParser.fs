@@ -43,7 +43,8 @@ let rec fold (f: 'a -> 'b -> 'b) (init : 'b) (p: 'a t): 'b t =
 
 let number = map (fun s -> %s |> System.Int32.Parse) (many1 digit) 
 let word   = map (~%) (many1 alpha)
-let spaces = many0 (char ' ' <|> char '\t' <|> char '\n' <|> char '\010')
+let spaces = many0 (char ' ' <|> char '\t'  <|> char '\010'
+                             <|> (symbol &"\r\n" >> mreturn '\n') <|> char '\n')
 let sp   f = spaces >> f << spaces 
 
 let paren p =
