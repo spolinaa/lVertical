@@ -25,18 +25,28 @@ module Parser =
     | [] -> raise EmptyList
 
   let rec pLeftAssoc' opParser pNext =
-    opParser >>= fun op ->
-    pNext >>= fun r ->
-    mreturn (fun l -> BinOp (op, l, r))
+    parser {
+      let! op = opParser
+      let!  r = pNext
+      return (fun l -> BinOp (op, l, r))
+    }
   let rec pLeftAssoc opParser pNext =
     let app f x = f x 
-    pNext >>= fun l -> fold app l (pLeftAssoc' opParser pNext)
+    parser {
+      let! l = pNext
+      return! fold app l (pLeftAssoc' opParser pNext)
+    }
   let rec pRightAssoc opParser pNext =
-    pNext >>= fun leftArg ->
-    (opParser >>= fun op ->
-     (pRightAssoc opParser pNext) >>= fun s ->
-       mreturn (BinOp (op, leftArg, s)))
-    <|> mreturn leftArg
+    parser {
+      let! leftArg = pNext
+      let  l =
+        parser {
+          let! op = opParser
+          let! s  = (pRightAssoc opParser pNext)
+          return BinOp (op, leftArg, s)
+        }
+      return! (l <|> mreturn leftArg)
+    }
 
   let rec parse _ : t CoreParser.t =
     let op1Parser = char '^' |> sp

@@ -2,6 +2,13 @@
 
 type 'a t = char list -> ('a * char list) list
 
+type ParserMonad () =
+  member this.Return (r : 'a) = fun s -> [(r, s)]
+  member this.Bind (p : 'a t, f : 'a -> 'b t) = fun s ->
+    List.concat [for (r, s') in p s -> (f r) s']
+  member this.ReturnFrom (x) = x
+let parser = new ParserMonad ()
+
 let (>>=) (p: 'a t) (f: 'a -> 'b t) = fun s ->
   List.concat [for (r, s') in p s -> (f r) s']
 
@@ -25,12 +32,22 @@ let (<|>) p q = fun s ->
 let (++) p q = fun s -> List.append (p s) (q s)
 
 let rec many0 p = many1 p <|> mreturn []
-and many1 p = p >>= fun r -> many0 p >>= fun rs -> mreturn (r::rs)
+and many1 p =
+  parser {
+    let! r  = p
+    let! rs = many0 p
+    return (r::rs)
+  }
 
 let rec symbol cs =
   match cs with
   | [] -> mreturn [] 
-  | c::cs' -> char c >> symbol cs' >> mreturn cs
+  | c::cs' ->
+    parser {
+      let! _ = (char c)
+      let! _ = (symbol cs')
+      return cs
+    }
 
 let (~&) (s: string   ) = s.ToCharArray() |> List.ofArray
 let (~%) (l: char list) = new string(Array.ofList l)
