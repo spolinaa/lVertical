@@ -46,6 +46,13 @@ module Parser =
           return BinOp (op, leftArg, s)
         }
       return! (l <|> mreturn leftArg)
+
+      (*
+      let! op = opParser
+      let! s  = pRightAssoc opParser pNext
+      return BinOp (op, leftArg, s)
+      return leftArg
+      *)
     }
 
   let rec parse _ : t CoreParser.t =
@@ -56,17 +63,21 @@ module Parser =
     let baseParser = term <|> paren parse
     pLeftAssoc op3Parser (pLeftAssoc op2Parser (pRightAssoc op1Parser baseParser))
 
-let (>>=) a f =
-  match a with
-  | None -> None
-  | Some  a -> f a 
-let mreturn a = Some a
+type OptionBuilder () =
+  member this.Return(a) = Some a
+  member this.Bind(p, f) =
+    match p with
+    | None   -> None
+    | Some a -> f a
+let option = OptionBuilder ()
 
 let rec calc env e =
   match e with
   | Num n -> Some n
   | Var x -> env  x
   | BinOp (o, x, y) ->
-    calc env x >>= fun vx -> 
-    calc env y >>= fun vy -> 
-    (op o) vx vy |> mreturn 
+    option {
+      let! vx = calc env x
+      let! vy = calc env y
+      return (op o) vx vy
+    }

@@ -7,6 +7,11 @@ type ParserMonad () =
   member this.Bind (p : 'a t, f : 'a -> 'b t) = fun s ->
     List.concat [for (r, s') in p s -> (f r) s']
   member this.ReturnFrom (x) = x
+  member this.Combine (p, q) = fun s ->
+    match p s with
+    | [] -> q s
+    | rs -> rs
+  member this.Delay (f) = f ()
 let parser = new ParserMonad ()
 
 let (>>=) (p: 'a t) (f: 'a -> 'b t) = fun s ->
@@ -31,7 +36,11 @@ let (<|>) p q = fun s ->
   | rs -> rs  
 let (++) p q = fun s -> List.append (p s) (q s)
 
-let rec many0 p = many1 p <|> mreturn []
+let rec many0 p =
+  parser {
+    return! many1 p
+    return  []
+  }
 and many1 p =
   parser {
     let! r  = p
@@ -60,18 +69,26 @@ let rec fold (f: 'a -> 'b -> 'b) (init : 'b) (p: 'a t): 'b t =
 
 let number = map (fun s -> %s |> System.Int32.Parse) (many1 digit) 
 let word   = map (~%) (many1 alpha)
-let spaces = many0 (char ' ' <|> char '\t'  <|> char '\010'
-                             <|> (symbol &"\r\n" >> mreturn '\n') <|> char '\n')
+let space =
+  parser {
+    return! char ' '
+    return! char '\t'
+    return! char '\010'
+    let! _ = symbol &"\r\n"
+    return '\n'
+    return! char '\n'
+  }
+let spaces = many0 space
 let sp   f = spaces >> f << spaces 
 
-let paren p =
-  let lparen = char '('
-  let rparen = char ')'
-  sp lparen >>= (fun _ -> p() << sp rparen)
+let gparen lparen rparen p =
+  parser {
+    let! _ = sp lparen
+    return! p() << sp rparen
+  }
+
+let paren  p = gparen (char '(') (char ')') p
 let paren' p = paren (fun _ -> p)  
 
-let cparen p =
-  let lcparen = char '{'
-  let rcparen = char '}'
-  sp lcparen >>= (fun _ -> p() << sp rcparen)
+let cparen  p = gparen (char '{') (char '}') p
 let cparen' p = cparen (fun _ -> p) 

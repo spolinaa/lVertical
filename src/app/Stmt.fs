@@ -41,7 +41,14 @@ module Parser =
       return! p() |> cparen' |> map (fun op -> While (e, op))
     }
 
-  let term p = readP <|> writeP <|> assignP <|> ifP p <|> whileP p
+  let term p =
+    parser {
+      return! readP
+      return! writeP
+      return! assignP
+      return! ifP p
+      return! whileP p
+    }
 
   let seqP p =
     parser {
