@@ -3,7 +3,7 @@ echo "Downloading NuGet"
 curl -L http://nuget.org/nuget.exe -o NuGet.exe
 chmod +x NuGet.exe
 echo "Downloading FAKE..."
-./NuGet.exe Install FAKE -OutputDirectory tools -ExcludeVersion
+mono NuGet.exe Install FAKE -OutputDirectory tools -ExcludeVersion
 chmod +x tools/FAKE/tools/FAKE.exe
 echo "Downloading NUnit.Runners..."
-./NuGet.exe Install NUnit.Runners -OutputDirectory packages -ExcludeVersion
+mono NuGet.exe Install NUnit.Runners -OutputDirectory packages -ExcludeVersion
