@@ -7,6 +7,8 @@ Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "test", "src\test\test.fspro
 EndProject
 Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "app", "src\app\app.fsproj", "{4C17BF65-9F5A-45B8-8CFB-84F874B6DA81}"
 EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "gui", "src\gui\gui.fsproj", "{E66BCBF0-E624-4684-A799-16B0811CBFF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,12 +23,17 @@ Global
 		{AD89BDAC-B2D4-47B9-A8EB-59887DD9E50A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD89BDAC-B2D4-47B9-A8EB-59887DD9E50A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD89BDAC-B2D4-47B9-A8EB-59887DD9E50A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E66BCBF0-E624-4684-A799-16B0811CBFF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E66BCBF0-E624-4684-A799-16B0811CBFF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E66BCBF0-E624-4684-A799-16B0811CBFF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E66BCBF0-E624-4684-A799-16B0811CBFF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AD89BDAC-B2D4-47B9-A8EB-59887DD9E50A} = {10383D56-5F08-4F39-9E2A-4253791C009B}
 		{4C17BF65-9F5A-45B8-8CFB-84F874B6DA81} = {10383D56-5F08-4F39-9E2A-4253791C009B}
+		{E66BCBF0-E624-4684-A799-16B0811CBFF4} = {10383D56-5F08-4F39-9E2A-4253791C009B}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\test\test.fsproj
+		StartupItem = src\gui\gui.fsproj
 	EndGlobalSection
 EndGlobal
