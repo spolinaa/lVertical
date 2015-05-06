@@ -19,10 +19,10 @@ let programLabel =
   lbl.AutoSize <- true
   lbl
 
-let mutable env       : string -> Option<int> = fun (s : string) -> None
-let mutable program   : Option<Stmt.t> = None 
-let mutable state     : Stmt.t list = []
-let mutable env_prev  : (string -> Option<int>) list = [] 
+let mutable env     : string -> Option<int> = fun (s : string) -> None
+let mutable program : Option<Stmt.t> = None 
+let mutable state   : Stmt.t list = []
+let mutable env_prev: (string -> Option<int>) list = [] 
 
 let prevStepAction (but : Button) args =
   match state with 
