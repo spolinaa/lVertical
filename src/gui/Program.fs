@@ -19,9 +19,10 @@ let programLabel =
   lbl.AutoSize <- true
   lbl
 
-let mutable env     : string -> Option<int> = fun (s : string) -> None
-let mutable program : Option<Stmt.t> = None 
-let mutable state : Stmt.t list = []
+let mutable env       : string -> Option<int> = fun (s : string) -> None
+let mutable program   : Option<Stmt.t> = None 
+let mutable state     : Stmt.t list = []
+let mutable env_prev : (string -> Option<int>) list = [] 
 
 let prevStepAction (but : Button) args =
   match state with 
@@ -30,6 +31,10 @@ let prevStepAction (but : Button) args =
     program <- Some a
     state <- list
     if list = [] then but.Enabled <- false
+    match env_prev with
+    | [] -> ()
+    | a :: list -> env <- a
+                   env_prev <- list
   programLabel.Text <- sprintf "%A" program
 
 let prevStepButton =
@@ -45,9 +50,10 @@ let nextStepAction (but : Button) args =
   | None   -> but.Enabled <- false
   | Some p ->
     let (nenv, np) = ss env p
-    env     <- nenv
-    state   <- p :: state
-    program <- np
+    env      <- nenv
+    state    <- p :: state
+    env_prev <- env :: env_prev
+    program  <- np
     if program = None then but.Enabled <- false
     programLabel.Text <- sprintf "%A" program
     prevStepButton.Enabled <- true
